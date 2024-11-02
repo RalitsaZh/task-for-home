@@ -16,7 +16,7 @@ public interface VerificationCodeRepository extends CrudRepository<VerificationC
 
     boolean existsByVerificationCode(String verificationCode);
 
-    VerificationCode findByEmailAndExpirationTimeIsAfter(String email, LocalDateTime currentTime);
+    VerificationCode findByEmailAndExpirationTimeIsAfterAndIsCodeUsedIsFalse(String email, LocalDateTime currentTime);
 
     @Modifying
     void deleteByExpirationTimeIsBefore(LocalDateTime currentTime);

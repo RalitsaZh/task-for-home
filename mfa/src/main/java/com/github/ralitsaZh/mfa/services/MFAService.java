@@ -43,6 +43,9 @@ public class MFAService {
     public boolean verifyMfaCode(String email, String code) {
         var currentTime = LocalDateTime.now();
         var optionalCode = codeRepository.findByVerificationCodeAndEmailAndExpirationTimeIsAfterAndIsCodeUsedFalse(code, email, currentTime);
+        logger.info("Checking if code {} is used", code);
+        logger.info("Checking optionalCode {}", optionalCode);
+
         if (optionalCode != null && optionalCode.getId() != null) {
             optionalCode.setCodeUsed(true);
             codeRepository.save(optionalCode);

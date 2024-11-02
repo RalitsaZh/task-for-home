@@ -26,7 +26,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     }
 
     public VerificationCode createAndSaveVerificationCode(String email) {
-        VerificationCode activeCodeForUser = codeRepository.findByEmailAndExpirationTimeIsAfter(email, LocalDateTime.now());
+        VerificationCode activeCodeForUser = codeRepository.findByEmailAndExpirationTimeIsAfterAndIsCodeUsedIsFalse(email, LocalDateTime.now());
         if (activeCodeForUser != null) {
             logger.info("Email already in use, skipping verification code");
             return activeCodeForUser;
@@ -36,6 +36,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         verificationCode.setEmail(email);
         verificationCode.setVerificationCode(code);
         verificationCode.setExpirationTime(LocalDateTime.now().plusMinutes(EXPIRY_DURATION_FIFTEEN_MINUTES));
+        verificationCode.setCodeUsed(false);
         codeRepository.save(verificationCode);
         logger.info("Created verification code for email: {}", email);
         return verificationCode;

@@ -1,17 +1,41 @@
 version: '3.9'
 
 services:
+  app:
+    image: mfa:5.0
+    environment:
+      # set environment var to override spring.datasource.url since it has to point to the host of the database container (db)
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/nexo_db
+      - SPRING_KAFKA_BOOTSTRAP-SERVERS=kafka:9092
+      - SPRING_DATA_REDIS_HOST=cache
+    deploy:
+      replicas: 3            # Creates 3 instances of 'app'
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - db
+      - cache
+      - kafka
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "8080:80"             # Expose Nginx on port 8080
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app
   db:
     image: postgres:17.0
     ports:
       - 5432:5432
     volumes:
+      # map the pg datafiles dir to ~/apps/postgres_emfa (for Win C:\Users\<user>\apps\postgres_emfa)
       - ~/apps/postgres_emfa:/var/lib/postgresql/data
-      - ./init_emfa.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - POSTGRES_PASSWORD=cost#123$
       - POSTGRES_USER=postgres
-      - POSTGRES_DB=mfa
+      - POSTGRES_DB=nexo_db
   cache:
     image: redis:6.2-alpine
     restart: always
@@ -31,7 +55,7 @@ services:
     volumes:
       - ~/apps/kafka_data:/var/lib/kafka/data
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://localhost:9092,OUTSIDE://localhost:9093
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9092,OUTSIDE://kafka:9093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_LISTENERS: INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9093
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
