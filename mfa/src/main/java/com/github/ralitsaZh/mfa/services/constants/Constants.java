@@ -10,8 +10,8 @@ public class Constants {
     public static final HttpStatus INTERNAL_SERVER_ERROR  = HttpStatus.INTERNAL_SERVER_ERROR;
 
     public static final int INITIAL_ATTEMPTS = 0;
-    public static final int MAX_ATTEMPTS = 10;
-    public static final int EXPIRY_DURATION_FIFTEEN_MINUTES = 10;
+    public static final int MAX_ATTEMPTS = 11;
+    public static final int EXPIRY_DURATION_TEN_MINUTES = 10;
     public static final int UUID_SUBSTRING_START_INDEX = 0;
     public static final int UUID_SUBSTRING_END_INDEX = 6;
 

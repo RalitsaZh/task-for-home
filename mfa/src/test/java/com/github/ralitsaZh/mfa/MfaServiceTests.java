@@ -13,7 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
-import static com.github.ralitsaZh.mfa.services.constants.Constants.EXPIRY_DURATION_FIFTEEN_MINUTES;
+import static com.github.ralitsaZh.mfa.services.constants.Constants.EXPIRY_DURATION_TEN_MINUTES;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,7 +39,6 @@ class MfaServiceTests {
     private static final String MFA_SUBJECT = "Send MFA Verification Code";
     private static final String MFA_MESSAGE_TEMPLATE = "Your verification code is: ";
     private static final String CODE = "fc1b9a";
-	private static final LocalDateTime FIXED_TIME = LocalDateTime.of(2024, 11, 2, 13, 45);
 
 
     @Test
@@ -44,7 +46,7 @@ class MfaServiceTests {
         VerificationCode verificationCode = new VerificationCode();
         verificationCode.setVerificationCode(CODE);
         verificationCode.setEmail(TEST_EMAIL);
-        verificationCode.setExpirationTime(LocalDateTime.now().plusMinutes(EXPIRY_DURATION_FIFTEEN_MINUTES));
+        verificationCode.setExpirationTime(LocalDateTime.now().plusMinutes(EXPIRY_DURATION_TEN_MINUTES));
 
         when(verificationCodeService.createAndSaveVerificationCode(TEST_EMAIL)).thenReturn(verificationCode);
 
@@ -58,21 +60,20 @@ class MfaServiceTests {
         );
     }
 
-//TODO this test is not working because of the LocalDateTime.now() in the verifyMfaCode method and i am not sure what to do about this.
-//    @Test
-//    void testVerifyMfaEmailSuccess() {
-//        VerificationCode verificationCode = new VerificationCode();
-//		verificationCode.setId(1L);
-//        verificationCode.setVerificationCode(CODE);
-//        verificationCode.setEmail(TEST_EMAIL);
-//        verificationCode.setExpirationTime(FIXED_TIME.plusMinutes(EXPIRY_DURATION_FIFTEEN_MINUTES));
-//
-//        when(codeRepository.findByVerificationCodeAndEmailAndExpirationTimeIsAfterAndIsCodeUsedFalse(CODE, TEST_EMAIL,FIXED_TIME)).thenReturn(verificationCode);
-//
-//        boolean result = mfaService.verifyMfaCode(TEST_EMAIL, CODE);
-//
-//        assertTrue(result, "verifyMfaCode should return true");
-//
-//    }
+    @Test
+    void testVerifyMfaEmailSuccess() {
+        VerificationCode verificationCode = new VerificationCode();
+		verificationCode.setId(1L);
+        verificationCode.setVerificationCode(CODE);
+        verificationCode.setEmail(TEST_EMAIL);
+        verificationCode.setExpirationTime(any(LocalDateTime.class));
+        verificationCode.setCodeUsed(false);
+
+        when(codeRepository.findByVerificationCodeAndEmailAndExpirationTimeIsAfterAndIsCodeUsedFalse(eq(CODE), eq(TEST_EMAIL),any(LocalDateTime.class))).thenReturn(verificationCode);
+
+        boolean result = mfaService.verifyMfaCode(TEST_EMAIL, CODE);
+
+        assertTrue(result, "verifyMfaCode should return true");
+    }
 
 }

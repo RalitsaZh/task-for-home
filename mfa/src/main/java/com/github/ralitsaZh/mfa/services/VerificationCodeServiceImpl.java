@@ -35,21 +35,21 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         VerificationCode verificationCode = new VerificationCode();
         verificationCode.setEmail(email);
         verificationCode.setVerificationCode(code);
-        verificationCode.setExpirationTime(LocalDateTime.now().plusMinutes(EXPIRY_DURATION_FIFTEEN_MINUTES));
+        verificationCode.setExpirationTime(LocalDateTime.now().plusMinutes(EXPIRY_DURATION_TEN_MINUTES));
         verificationCode.setCodeUsed(false);
         codeRepository.save(verificationCode);
         logger.info("Created verification code for email: {}", email);
         return verificationCode;
     }
 
-    private String generateUniqueVerificationCode() {
+    public String generateUniqueVerificationCode() {
         String verificationCode;
         int attempts = INITIAL_ATTEMPTS;
 
         do {
             verificationCode = generateVerificationCode();
             attempts++;
-        } while (codeRepository.existsByVerificationCode(verificationCode) && attempts <= MAX_ATTEMPTS);
+        } while (codeRepository.existsByVerificationCode(verificationCode) && attempts < MAX_ATTEMPTS);
 
         if (attempts == MAX_ATTEMPTS) {
             throw new CodeGenerationException("Unable to generate a unique verification code after " + MAX_ATTEMPTS + " attempts.");

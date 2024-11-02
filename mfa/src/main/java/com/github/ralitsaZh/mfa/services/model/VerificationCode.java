@@ -21,6 +21,10 @@ public class VerificationCode {
     public VerificationCode() {
     }
 
+    public String getEmail() {
+        return email;
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -31,6 +35,10 @@ public class VerificationCode {
 
     public String getVerificationCode() {
         return verificationCode;
+    }
+
+    public LocalDateTime getExpirationTime() {
+        return expirationTime;
     }
 
     public void setExpirationTime(LocalDateTime expirationTime) {
@@ -45,6 +53,10 @@ public class VerificationCode {
         this.id = id;
     }
 
+    public Boolean getCodeUsed() {
+        return isCodeUsed;
+    }
+
     public void setCodeUsed(Boolean codeUsed) {
         isCodeUsed = codeUsed;
     }
@@ -53,4 +65,5 @@ public class VerificationCode {
     public String toString() {
         return verificationCode != null ? verificationCode : "";
     }
+
 }
