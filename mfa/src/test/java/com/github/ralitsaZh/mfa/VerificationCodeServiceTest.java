@@ -25,7 +25,7 @@ class VerificationCodeServiceTest {
     private VerificationCodeRepository verificationCodeRepositoryInject;
 
     @Test
-    public void testSendMfaEmail() throws IOException {
+    public void testSendMfaEmail() {
         String email = "ralitsaTest@nexo.com";
         verificationCodeService.createAndSaveVerificationCode(email);
         verify(verificationCodeRepository, times(1)).save(any());
