@@ -3,7 +3,6 @@ package com.github.ralitsaZh.mfa.controller;
 import com.github.ralitsaZh.mfa.services.MFAService;
 import com.github.ralitsaZh.mfa.services.RateLimiterService;
 import com.github.ralitsaZh.mfa.services.model.ResponseMessage;
-import com.github.ralitsaZh.mfa.services.model.VerificationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,22 +41,22 @@ public class MFAController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<VerificationResponse> verifyMfaCode(@RequestParam String email, @RequestParam String code) {
+    public ResponseEntity<ResponseMessage> verifyMfaCode(@RequestParam String email, @RequestParam String code) {
         if (rateLimiterService.isVerifyRateLimited(email)) {
-            VerificationResponse response = new VerificationResponse("Too many verification attempts.", TOO_MANY_REQUESTS.value());
+            ResponseMessage response = new ResponseMessage("Too many verification attempts.", TOO_MANY_REQUESTS.value());
             return ResponseEntity.status(TOO_MANY_REQUESTS).body(response);
         }
         try {
             boolean isValid = mfaService.verifyMfaCode(email, code);
             if (isValid) {
-                VerificationResponse response = new VerificationResponse("MFA code verified successfully.", STATUS_OK.value());
+                ResponseMessage response = new ResponseMessage("MFA code verified successfully.", STATUS_OK.value());
                 return ResponseEntity.ok(response);
             } else {
-                VerificationResponse response = new VerificationResponse("Invalid MFA code.", BAD_REQUEST.value());
+                ResponseMessage response = new ResponseMessage("Invalid MFA code.", BAD_REQUEST.value());
                 return ResponseEntity.status(BAD_REQUEST).body(response);
             }
         } catch (Exception e) {
-            VerificationResponse response = new VerificationResponse(
+            ResponseMessage response = new ResponseMessage(
                     "Error verifying MFA code: " + e.getMessage(), INTERNAL_SERVER_ERROR.value());
             return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(response);
         }
