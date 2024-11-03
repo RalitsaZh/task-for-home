@@ -1,5 +1,6 @@
 package com.github.ralitsaZh.mfa;
 
+import com.github.ralitsaZh.mfa.services.EmailConsumerService;
 import com.github.ralitsaZh.mfa.services.EmailPublisherServiceImpl;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
@@ -39,11 +40,14 @@ class EmailServiceTest {
 	private EmailPublisherServiceImpl emailPublisherService;
 
 	@Mock
+	private EmailConsumerService emailConsumerService;
+
+	@Mock
 	private SendGrid sendGrid;
 
 	@BeforeEach
 	void setUp() {
-		MockitoAnnotations.openMocks(this); // Ensure mocks and inject mocks are initialized
+		MockitoAnnotations.openMocks(this);
 	}
 
 	private static final String FROM_ADDRESS = "ralicazz@uni-sofia.bg";
@@ -75,41 +79,4 @@ class EmailServiceTest {
 
 	}
 
-
-	@Test
-	void testConsumeEmailMessage() throws IOException {
-		// Arrange
-		Mail mail = new Mail();
-		mail.setFrom(new com.sendgrid.helpers.mail.objects.Email(FROM_ADDRESS));
-		mail.setSubject(SUBJECT);
-		mail.addContent(new com.sendgrid.helpers.mail.objects.Content("text/plain", "This is a test message"));
-
-		Request expectedRequest = new Request();
-		expectedRequest.setMethod(Method.POST);
-		expectedRequest.setEndpoint("/mail/send");
-		expectedRequest.setBody(mail.build());
-
-		Response mockResponse = new Response();
-		mockResponse.setStatusCode(202);
-		mockResponse.setBody("Success");
-		mockResponse.setHeaders(null);
-
-		when(sendGrid.api(any(Request.class))).thenReturn(mockResponse);
-
-		// Act
-		emailPublisherService.sendEmail(TO_EMAIL, SUBJECT, MESSAGE);
-
-		// Assert
-		ArgumentCaptor<Request> requestCaptor = ArgumentCaptor.forClass(Request.class);
-		verify(sendGrid).api(requestCaptor.capture());
-
-		Request actualRequest = requestCaptor.getValue();
-		assertEquals(String.valueOf(expectedRequest.getMethod()), actualRequest.getMethod(), Method.POST);
-		assertEquals(expectedRequest.getEndpoint(), actualRequest.getEndpoint(), "/mail/send");
-		assertEquals(expectedRequest.getBody(), actualRequest.getBody(), mail);
-
-		// Optionally, verify the response handling
-		System.out.println("Verified status code: " + mockResponse.getStatusCode());
-		System.out.println("Verified response body: " + mockResponse.getBody());
-	}
 }

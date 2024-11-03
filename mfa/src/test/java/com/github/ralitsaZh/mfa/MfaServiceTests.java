@@ -47,6 +47,7 @@ class MfaServiceTests {
         verificationCode.setVerificationCode(CODE);
         verificationCode.setEmail(TEST_EMAIL);
         verificationCode.setExpirationTime(LocalDateTime.now().plusMinutes(EXPIRY_DURATION_TEN_MINUTES));
+        verificationCode.setCodeUsed(false);
 
         when(verificationCodeService.createAndSaveVerificationCode(TEST_EMAIL)).thenReturn(verificationCode);
 
@@ -66,7 +67,7 @@ class MfaServiceTests {
 		verificationCode.setId(1L);
         verificationCode.setVerificationCode(CODE);
         verificationCode.setEmail(TEST_EMAIL);
-        verificationCode.setExpirationTime(any(LocalDateTime.class));
+        verificationCode.setExpirationTime(LocalDateTime.now().plusMinutes(EXPIRY_DURATION_TEN_MINUTES));
         verificationCode.setCodeUsed(false);
 
         when(codeRepository.findByVerificationCodeAndEmailAndExpirationTimeIsAfterAndIsCodeUsedFalse(eq(CODE), eq(TEST_EMAIL),any(LocalDateTime.class))).thenReturn(verificationCode);
