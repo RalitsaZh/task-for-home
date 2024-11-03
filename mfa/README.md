@@ -91,21 +91,23 @@ This project provides a Java-based API for handling Multi-Factor Authentication 
 
 
 ## Quick Start Guide
-### Step 1: Build the Docker Image
+### Step 1: Update application.properties
+In the application.properties file, locate `***REMOVED***` and replace it with the KEY that I sent to you via email.
+
+### Step 2: Build the Docker Image
 Run the following command to build the Docker image for the application:
 
  - docker build -t mfa:5.0 .
 	
-### Step 2: Start the Application with Docker Compose
+### Step 3: Start the Application with Docker Compose
 - docker compose up
 
-### Step 3: Send MFA Code 
+### Step 4: Send MFA Code 
 (Note: The email may arrive in your spam folder, and there could be some delay.) 
 Using Postman, send a POST request to trigger the sending of an MFA code to your email. Replace YOUR_EMAIL with the email address where you want to receive the MFA code:
 - POST http://localhost:8080/api/mfa/send?email=YOUR_EMAIL
 
-
-### Step 4: Verify the MFA Code 
+### Step 5: Verify the MFA Code 
 Once you receive the code in your email, verify it by sending GET request. Replace YOUR_EMAIL with the email address you used in the previous step, and replace CODE with the actual code you received:
 - GET http://localhost:8080/api/mfa/verify?email=YOUR_EMAIL&code=CODE
 
